@@ -1,0 +1,61 @@
+<section class="contenedor-auth">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>lock_open</mat-icon>
+      <mat-card-title>Iniciar sesión</mat-card-title>
+      <mat-card-subtitle>Ingresá con tu DNI y contraseña</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <app-alerta-error [mensaje]="errorServidor()" />
+
+      <form [formGroup]="formulario" (ngSubmit)="iniciarSesion()" novalidate>
+        <mat-form-field appearance="outline">
+          <mat-label>DNI</mat-label>
+          <input matInput formControlName="dni" inputmode="numeric" maxlength="8" autocomplete="username" />
+          <mat-icon matSuffix>badge</mat-icon>
+          @if (formulario.controls.dni.hasError('required')) {
+            <mat-error>El DNI es obligatorio.</mat-error>
+          } @else if (formulario.controls.dni.hasError('pattern')) {
+            <mat-error>Ingresá solo números (7 u 8 dígitos).</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Contraseña</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="ocultarPassword() ? 'password' : 'text'"
+            autocomplete="current-password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            [attr.aria-label]="ocultarPassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+            (click)="ocultarPassword.set(!ocultarPassword())"
+          >
+            <mat-icon>{{ ocultarPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (formulario.controls.password.hasError('required')) {
+            <mat-error>La contraseña es obligatoria.</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" [disabled]="enviando()">
+          @if (enviando()) {
+            <mat-spinner diameter="20" />
+          } @else {
+            Ingresar
+          }
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <span>¿Todavía no tenés cuenta?</span>
+      <a mat-button routerLink="/registro">Registrate como paciente</a>
+    </mat-card-actions>
+  </mat-card>
+</section>

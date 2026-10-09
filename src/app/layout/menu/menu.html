@@ -1,0 +1,16 @@
+<nav aria-label="Navegación principal">
+  <mat-nav-list>
+    @for (opcion of opciones(); track opcion.ruta) {
+      <a
+        mat-list-item
+        [routerLink]="opcion.ruta"
+        routerLinkActive="opcion-activa"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="opcionElegida.emit()"
+      >
+        <mat-icon matListItemIcon>{{ opcion.icono }}</mat-icon>
+        <span matListItemTitle>{{ opcion.etiqueta }}</span>
+      </a>
+    }
+  </mat-nav-list>
+</nav>

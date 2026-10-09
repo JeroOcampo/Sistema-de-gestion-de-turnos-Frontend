@@ -1,0 +1,9 @@
+:host {
+  display: block;
+  padding-top: 8px;
+}
+
+.opcion-activa {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}

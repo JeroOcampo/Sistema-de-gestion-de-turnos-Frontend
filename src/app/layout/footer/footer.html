@@ -1,0 +1,30 @@
+<footer class="pie">
+  <div class="pie-contenido">
+    <section>
+      <h2>Clínica Virtual</h2>
+      <p>Gestión de turnos médicos en línea.</p>
+    </section>
+
+    <section>
+      <h2>Contacto</h2>
+      <ul>
+        <li><mat-icon>place</mat-icon> {{ contacto.sede }} · {{ contacto.direccion }}</li>
+        <li><mat-icon>call</mat-icon> <a [href]="'tel:' + contacto.telefono">{{ contacto.telefono }}</a></li>
+        <li><mat-icon>mail</mat-icon> <a [href]="'mailto:' + contacto.correo">{{ contacto.correo }}</a></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Redes sociales</h2>
+      <ul>
+        @for (red of redes; track red.nombre) {
+          <li>
+            <mat-icon>{{ red.icono }}</mat-icon>
+            <a [href]="red.url" target="_blank" rel="noopener noreferrer">{{ red.nombre }}</a>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+  <p class="derechos">© {{ anio }} Clínica Virtual · Trabajo práctico de Programación 2</p>
+</footer>

@@ -1,59 +1,82 @@
-# SistemaGestionTurnosFrontend
+# Clínica Virtual — Frontend del Sistema de Gestión de Turnos
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.25.
+Frontend en Angular del Sistema de Gestión de Turnos Médicos (Programación 2).
+Consume la API del backend: <https://github.com/S4nti21/Sistema-de-gestion-de-turnos-Backend>.
 
-## Development server
+## Versiones utilizadas
 
-To start a local development server, run:
+| Herramienta      | Versión  |
+| ---------------- | -------- |
+| Node.js          | 24.16.0 (compatible: `^20.19`, `^22.12`, `^24`) |
+| npm              | 11.13.0  |
+| Angular CLI      | 21.2.x   |
+| Angular          | 21.2.x   |
+| Angular Material | 21.2.x   |
+| TypeScript       | 5.9.x    |
+
+Sin SSR, estilos en SCSS, formularios con Reactive Forms.
+
+## Requisitos previos
+
+1. Node.js 22 LTS (22.12 o superior) o Node 24 LTS.
+2. Angular CLI 21: `npm install -g @angular/cli@21` (verificar con `ng version`).
+3. Backend de la clínica en ejecución en `http://localhost:3000` (con su base MySQL cargada y CORS habilitado, que ya viene activo en el backend).
+
+## Instalación y ejecución
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+La aplicación queda disponible en <http://localhost:4200>.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Otros comandos útiles:
 
 ```bash
-ng generate component component-name
+ng build   # compilación de producción en dist/
+ng test    # pruebas unitarias (Vitest)
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Cambiar la URL del backend
 
-```bash
-ng generate --help
+La URL base de la API se define en un único archivo: [`src/app/core/config/api.config.ts`](src/app/core/config/api.config.ts) (`API_BASE_URL`).
+
+## Estructura del proyecto
+
+```
+src/app/
+  core/
+    config/        URL base de la API
+    models/        interfaces TypeScript (usuario, cobertura, auth, respuesta de la API)
+    services/      auth, cobertura, notificaciones (consumo de la API)
+    interceptors/  envío del token JWT y traducción de errores del backend
+    guards/        acceso por sesión, por rol y solo-invitados
+  shared/components/  componentes reutilizables (encabezado de página, alerta de error)
+  layout/          header, menú lateral por rol y footer
+  features/
+    auth/          login y registro de pacientes
+    home/          pantalla principal (con y sin sesión)
+    perfil/        Mi perfil
+    paciente/ medico/ operador/ admin/   secciones por rol
+    errors/        acceso denegado, página no encontrada y "En construcción"
 ```
 
-## Building
+## Funcionalidades de la semana 1
 
-To build the project run:
+- Registro de pacientes con cobertura cargada desde `GET /coberturas`.
+- Inicio y cierre de sesión (`POST /auth/login`); el token se guarda en `localStorage` y la sesión se mantiene al recargar.
+- Mi perfil con los datos de `GET /auth/perfil`.
+- Menú de navegación según el rol (administrador, médico, operador, paciente); las funciones de próximas semanas muestran "En construcción".
+- Rutas protegidas por sesión y por rol (`/paciente`, `/medico`, `/operador`, `/admin`), con redirección al login o a "Acceso denegado".
+- Página "No encontrada" para rutas inexistentes.
+- La campana de notificaciones del header queda ubicada; su funcionalidad se completa en la semana 3.
 
-```bash
-ng build
-```
+## Endpoints consumidos
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Método | Ruta              | Uso                         |
+| ------ | ----------------- | --------------------------- |
+| POST   | `/auth/registro`  | Registro de paciente        |
+| POST   | `/auth/login`     | Inicio de sesión (DNI + contraseña) |
+| GET    | `/auth/perfil`    | Datos del usuario logueado  |
+| GET    | `/coberturas`     | Listado de coberturas       |
