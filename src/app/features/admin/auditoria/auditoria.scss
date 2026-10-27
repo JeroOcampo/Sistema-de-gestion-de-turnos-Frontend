@@ -1,0 +1,39 @@
+.capitalizado {
+  text-transform: capitalize;
+}
+
+.accion {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font: var(--mat-sys-label-small);
+  letter-spacing: 0.04em;
+}
+
+.accion-ALTA {
+  background: #dcefdc;
+  color: #1b5e20;
+}
+
+.accion-MODIFICACION {
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.accion-BAJA {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.detalle {
+  max-width: 460px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.datos-enviados {
+  margin-top: 2px;
+  font: var(--mat-sys-body-small);
+  font-family: monospace;
+  color: var(--mat-sys-on-surface-variant);
+  overflow-wrap: anywhere;
+}

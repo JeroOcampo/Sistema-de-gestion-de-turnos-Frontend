@@ -3,7 +3,6 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { ErrorApi } from '../models/error-api.model';
 import { AuthService } from '../services/auth.service';
-import { NotificacionService } from '../services/notificacion.service';
 
 /**
  * Traduce cualquier falla HTTP a un ErrorApi con un mensaje apto para el usuario.
@@ -11,7 +10,6 @@ import { NotificacionService } from '../services/notificacion.service';
  */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
-  const avisos = inject(NotificacionService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -20,7 +18,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       // Token vencido o inválido con sesión activa (un login fallido es un 401 sin sesión).
       if (error.status === 401 && auth.haySesion()) {
         auth.expirarSesion();
-        avisos.error('Tu sesión expiró. Iniciá sesión nuevamente.');
       }
       return throwError(() => new ErrorApi(mensaje, error.status));
     }),

@@ -28,10 +28,17 @@
       <button
         mat-icon-button
         type="button"
-        aria-label="Notificaciones"
-        matTooltip="Notificaciones (próximamente)"
+        [attr.aria-label]="etiquetaCampana()"
+        [matTooltip]="etiquetaCampana()"
+        [matMenuTriggerFor]="menuNotificaciones"
+        (menuOpened)="notificaciones.actualizar()"
       >
-        <mat-icon>notifications</mat-icon>
+        <mat-icon
+          [matBadge]="notificaciones.noLeidas()"
+          [matBadgeHidden]="notificaciones.noLeidas() === 0"
+          aria-hidden="false"
+          >notifications</mat-icon
+        >
       </button>
       <button mat-button type="button" class="cerrar-sesion" (click)="auth.cerrarSesion()">
         <mat-icon>logout</mat-icon>
@@ -43,3 +50,32 @@
     <a mat-button class="acceso" routerLink="/login">Iniciar sesión</a>
   }
 </mat-toolbar>
+
+<mat-menu #menuNotificaciones="matMenu" class="menu-notificaciones" xPosition="before">
+  <!-- Los clics dentro de la lista no cierran el menú: así se pueden marcar varias como leídas. -->
+  <div class="lista-notificaciones" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+    <h2 class="titulo-notificaciones">Notificaciones</h2>
+    @for (notificacion of notificaciones.notificaciones(); track notificacion.id) {
+      <div class="notificacion" [class.no-leida]="!notificacion.leida">
+        <mat-icon class="icono-tipo">{{ icono(notificacion.tipo) }}</mat-icon>
+        <div class="cuerpo">
+          <p>{{ notificacion.mensaje }}</p>
+          <span class="fecha">{{ notificacion.fecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        @if (!notificacion.leida) {
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Marcar como leída"
+            aria-label="Marcar como leída"
+            (click)="marcarLeida(notificacion.id)"
+          >
+            <mat-icon>mark_email_read</mat-icon>
+          </button>
+        }
+      </div>
+    } @empty {
+      <p class="sin-notificaciones">No tenés notificaciones.</p>
+    }
+  </div>
+</mat-menu>

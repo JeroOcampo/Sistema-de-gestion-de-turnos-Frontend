@@ -1,0 +1,85 @@
+.pasos {
+  max-width: 820px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+}
+
+.acciones-paso {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.busqueda {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lista-pacientes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.opcion-paciente {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 10px;
+  background: var(--mat-sys-surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  span {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &.elegido {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-primary-container);
+
+    mat-icon {
+      color: var(--mat-sys-primary);
+    }
+  }
+}
+
+.calendario {
+  width: 320px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 24px;
+  margin: 0 0 16px;
+
+  dt {
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font: var(--mat-sys-body-large);
+  }
+}
+
+.capitalizado::first-letter {
+  text-transform: uppercase;
+}
+
+.nota {
+  width: 100%;
+  max-width: 520px;
+}

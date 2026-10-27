@@ -1,0 +1,119 @@
+<app-encabezado-pagina
+  titulo="Usuarios"
+  subtitulo="Pacientes, médicos, operadores y administradores de la clínica."
+  icono="manage_accounts"
+/>
+
+<div class="barra-acciones">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Nombre</mat-label>
+    <input
+      matInput
+      #filtroNombre
+      [value]="nombre()"
+      (input)="nombre.set(filtroNombre.value); pagina.set(0)"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Apellido</mat-label>
+    <input
+      matInput
+      #filtroApellido
+      [value]="apellido()"
+      (input)="apellido.set(filtroApellido.value); pagina.set(0)"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Tipo de usuario</mat-label>
+    <mat-select [value]="rol()" (selectionChange)="rol.set($event.value); pagina.set(0)">
+      <mat-option value="">Todos</mat-option>
+      @for (opcion of roles; track opcion) {
+        <mat-option [value]="opcion">{{ etiquetaRol[opcion] }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Sede</mat-label>
+    <mat-select [value]="idSede()" (selectionChange)="idSede.set($event.value); pagina.set(0)">
+      <mat-option [value]="0">Todas</mat-option>
+      @for (sede of sedes(); track sede.id) {
+        <mat-option [value]="sede.id">{{ sede.nombre }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-button type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
+  <span class="espaciador"></span>
+  <a mat-flat-button routerLink="nuevo">
+    <mat-icon>person_add</mat-icon>
+    Nuevo usuario
+  </a>
+</div>
+
+<app-alerta-error [mensaje]="errorServidor()" />
+
+@if (cargando() && usuarios().length === 0) {
+  <app-cargando texto="Cargando usuarios…" />
+} @else if (usuarios().length === 0) {
+  <app-estado-vacio icono="person_search" mensaje="No hay usuarios que coincidan con los filtros." />
+} @else {
+  <div class="tabla-contenedor">
+    @if (cargando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    <table mat-table [dataSource]="usuarios()">
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef>Apellido y nombre</th>
+        <td mat-cell *matCellDef="let usuario">{{ usuario.apellido }}, {{ usuario.nombre }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dni">
+        <th mat-header-cell *matHeaderCellDef>DNI</th>
+        <td mat-cell *matCellDef="let usuario">{{ usuario.dni }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Correo electrónico</th>
+        <td mat-cell *matCellDef="let usuario">{{ usuario.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="rol">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let usuario">{{ usuario.rol | etiquetaRol }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="sede">
+        <th mat-header-cell *matHeaderCellDef>Sede</th>
+        <td mat-cell *matCellDef="let usuario">{{ usuario.sede_nombre ?? '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="celda-acciones">Acciones</th>
+        <td mat-cell *matCellDef="let usuario" class="celda-acciones">
+          <a
+            mat-icon-button
+            [routerLink]="[usuario.id]"
+            matTooltip="Modificar"
+            [attr.aria-label]="'Modificar a ' + usuario.nombre + ' ' + usuario.apellido"
+          >
+            <mat-icon>edit</mat-icon>
+          </a>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let fila; columns: columnas"></tr>
+    </table>
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="pagina()"
+      [pageSize]="tamanio()"
+      [pageSizeOptions]="opcionesTamanio"
+      (page)="cambiarPagina($event)"
+      showFirstLastButtons
+    />
+  </div>
+}

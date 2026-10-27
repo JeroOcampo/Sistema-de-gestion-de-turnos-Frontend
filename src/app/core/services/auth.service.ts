@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, switchMap, tap, throwError } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
@@ -12,13 +12,17 @@ import {
   RespuestaLogin,
 } from '../models/auth.model';
 import { ROLES, Usuario } from '../models/usuario.model';
+import { AvisoService } from './aviso.service';
 
 const CLAVE_TOKEN = 'clinica.token';
+/** Mayor demora que acepta setTimeout (~24 días); por encima se dispararía al instante. */
+const DEMORA_MAXIMA_MS = 2_147_483_647;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly avisos = inject(AvisoService);
   private readonly url = `${API_BASE_URL}/auth`;
 
   private readonly _token = signal<string | null>(this.leerTokenVigente());
@@ -34,8 +38,18 @@ export class AuthService {
   constructor() {
     // Si la sesión sobrevive a una recarga, se recuperan los datos del usuario para el header.
     if (this.haySesion()) {
-      this.cargarPerfil().subscribe({ error: () => undefined });
+      this.refrescarPerfil().subscribe({ error: () => undefined });
     }
+
+    // Si el token vence mientras se usa la aplicación, se vuelve al login sin esperar otro pedido.
+    effect((alLimpiar) => {
+      const vencimiento = this.payload()?.exp;
+      if (!vencimiento) return;
+      const restante = vencimiento * 1000 - Date.now();
+      if (restante > DEMORA_MAXIMA_MS) return;
+      const temporizador = setTimeout(() => this.expirarSesion(), restante);
+      alLimpiar(() => clearTimeout(temporizador));
+    });
   }
 
   registrarPaciente(datos: DatosRegistroPaciente): Observable<PacienteRegistrado> {
@@ -47,7 +61,7 @@ export class AuthService {
   iniciarSesion(credenciales: CredencialesLogin): Observable<Usuario> {
     return this.http.post<ApiRespuesta<RespuestaLogin>>(`${this.url}/login`, credenciales).pipe(
       tap((r) => this.guardarToken(r.datos.token)),
-      switchMap(() => this.cargarPerfil()),
+      switchMap(() => this.refrescarPerfil()),
       // Si el perfil no puede obtenerse, no se deja una sesión a medias.
       catchError((error) => {
         this.limpiarSesion();
@@ -60,6 +74,11 @@ export class AuthService {
     return this.http.get<ApiRespuesta<Usuario>>(`${this.url}/perfil`).pipe(map((r) => r.datos));
   }
 
+  /** Vuelve a pedir el perfil y actualiza los datos del usuario logueado (header, Mis datos). */
+  refrescarPerfil(): Observable<Usuario> {
+    return this.obtenerPerfil().pipe(tap((usuario) => this._usuario.set(usuario)));
+  }
+
   cerrarSesion(): void {
     this.limpiarSesion();
     this.router.navigate(['/']);
@@ -68,11 +87,8 @@ export class AuthService {
   /** Cierra la sesión por token vencido/inválido y lleva al login. */
   expirarSesion(): void {
     this.limpiarSesion();
+    this.avisos.error('Tu sesión expiró. Iniciá sesión nuevamente.');
     this.router.navigate(['/login']);
-  }
-
-  private cargarPerfil(): Observable<Usuario> {
-    return this.obtenerPerfil().pipe(tap((usuario) => this._usuario.set(usuario)));
   }
 
   private guardarToken(token: string): void {

@@ -1,13 +1,17 @@
 <app-encabezado-pagina
-  titulo="Mi perfil"
-  subtitulo="Datos de tu cuenta en la clínica"
+  [titulo]="esPaciente() ? 'Mis datos personales' : 'Mi perfil'"
+  [subtitulo]="
+    esPaciente()
+      ? 'Podés modificar tu email, contraseña, teléfono y cobertura.'
+      : 'Datos de tu cuenta en la clínica'
+  "
   icono="account_circle"
 />
 
 <app-alerta-error [mensaje]="errorServidor()" />
 
 @if (cargando()) {
-  <div class="cargando"><mat-spinner diameter="40" /></div>
+  <app-cargando />
 } @else if (usuario(); as u) {
   <mat-card appearance="outlined">
     <mat-card-content>
@@ -26,27 +30,117 @@
         </div>
         <div>
           <dt>Fecha de nacimiento</dt>
-          <dd>{{ u.fecha_nacimiento | date: 'dd/MM/yyyy' : 'UTC' }}</dd>
-        </div>
-        <div>
-          <dt>Correo electrónico</dt>
-          <dd>{{ u.email }}</dd>
-        </div>
-        <div>
-          <dt>Teléfono</dt>
-          <dd>{{ u.telefono || 'No informado' }}</dd>
+          <dd>{{ u.fecha_nacimiento | date: 'dd/MM/yyyy' }}</dd>
         </div>
         <div>
           <dt>Tipo de usuario</dt>
           <dd>{{ etiquetaRol[u.rol] }}</dd>
         </div>
-        @if (u.rol === 'paciente') {
+        @if (!esPaciente()) {
           <div>
-            <dt>Cobertura</dt>
-            <dd>{{ cobertura() ?? 'No informada' }}</dd>
+            <dt>Correo electrónico</dt>
+            <dd>{{ u.email }}</dd>
+          </div>
+          <div>
+            <dt>Teléfono</dt>
+            <dd>{{ u.telefono || 'No informado' }}</dd>
           </div>
         }
       </dl>
     </mat-card-content>
   </mat-card>
+
+  @if (esPaciente()) {
+    <mat-card appearance="outlined" class="edicion">
+      <mat-card-header>
+        <mat-card-title>Datos que podés modificar</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-alerta-error [mensaje]="errorGuardado()" />
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+          <div class="fila">
+            <mat-form-field appearance="outline">
+              <mat-label>Correo electrónico</mat-label>
+              <input matInput type="email" formControlName="email" autocomplete="email" />
+              @if (formulario.controls.email.hasError('required')) {
+                <mat-error>El correo electrónico es obligatorio.</mat-error>
+              } @else if (formulario.controls.email.hasError('email')) {
+                <mat-error>Ingresá un correo con formato válido.</mat-error>
+              } @else if (formulario.controls.email.hasError('maxlength')) {
+                <mat-error>Máximo 100 caracteres.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput formControlName="telefono" inputmode="tel" autocomplete="tel" />
+              @if (formulario.controls.telefono.hasError('pattern')) {
+                <mat-error>Ingresá solo números (entre 6 y 20 dígitos).</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Cobertura médica</mat-label>
+            <mat-select formControlName="id_cobertura">
+              @for (opcion of coberturas(); track opcion.id) {
+                <mat-option [value]="opcion.id">{{ opcion.nombre }}</mat-option>
+              }
+            </mat-select>
+            <mat-error>Seleccioná tu cobertura.</mat-error>
+          </mat-form-field>
+
+          <div class="fila">
+            <mat-form-field appearance="outline">
+              <mat-label>Nueva contraseña (opcional)</mat-label>
+              <input
+                matInput
+                formControlName="password"
+                [type]="ocultarPassword() ? 'password' : 'text'"
+                autocomplete="new-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                [attr.aria-label]="ocultarPassword() ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+                (click)="ocultarPassword.set(!ocultarPassword())"
+              >
+                <mat-icon>{{ ocultarPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+              </button>
+              <mat-hint>Dejala vacía para conservar la actual.</mat-hint>
+              @if (formulario.controls.password.hasError('minlength')) {
+                <mat-error>Debe tener al menos 6 caracteres.</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Repetir la nueva contraseña</mat-label>
+              <input
+                matInput
+                formControlName="repetirPassword"
+                [type]="ocultarPassword() ? 'password' : 'text'"
+                autocomplete="new-password"
+                [errorStateMatcher]="matcherRepetida"
+              />
+              @if (formulario.hasError('contrasenasDistintas')) {
+                <mat-error>Las contraseñas no coinciden.</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="acciones">
+            <button mat-flat-button type="submit" [disabled]="guardando()">
+              @if (guardando()) {
+                <mat-spinner diameter="20" />
+              } @else {
+                Guardar cambios
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
 }

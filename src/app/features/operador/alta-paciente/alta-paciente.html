@@ -1,0 +1,30 @@
+<app-encabezado-pagina
+  titulo="Alta de paciente"
+  subtitulo="Los mismos datos que pide el registro de la clínica."
+  icono="person_add"
+/>
+
+@if (creado(); as paciente) {
+  <div class="creado" role="status">
+    <mat-icon>check_circle</mat-icon>
+    <p>
+      <strong>{{ paciente.apellido }}, {{ paciente.nombre }}</strong> (DNI {{ paciente.dni }}) ya
+      es paciente de la clínica.
+    </p>
+    <a mat-flat-button routerLink="/operador/turnos/nuevo" [queryParams]="{ dni: paciente.dni }">
+      <mat-icon>event_available</mat-icon>
+      Asignarle un turno
+    </a>
+  </div>
+}
+
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <app-formulario-paciente
+      textoBoton="Dar de alta"
+      [enviando]="enviando()"
+      [errorServidor]="errorServidor()"
+      (enviar)="darDeAlta($event)"
+    />
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,46 @@
+mat-accordion {
+  display: block;
+  max-width: 900px;
+}
+
+.fecha-turno {
+  font-weight: 500;
+}
+
+mat-panel-description {
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.detalle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+
+  dt {
+    font: var(--mat-sys-label-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 2px 0 0;
+  }
+}
+
+.historial {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--mat-sys-surface-container-low);
+
+  h3 {
+    margin: 0 0 8px;
+    font: var(--mat-sys-title-small);
+  }
+}
+
+.capitalizado::first-letter {
+  text-transform: uppercase;
+}

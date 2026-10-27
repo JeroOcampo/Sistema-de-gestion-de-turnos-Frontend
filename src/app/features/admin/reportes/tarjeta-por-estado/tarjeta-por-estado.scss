@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+mat-card {
+  height: 100%;
+}
+
+.grafico {
+  position: relative;
+  margin: 8px 0 16px;
+}
+
+.tabla-valores {
+  width: 100%;
+  background: transparent;
+  --mat-table-row-item-container-height: 36px;
+  --mat-table-header-container-height: 40px;
+}
+
+.tabla-valores th,
+.tabla-valores td {
+  padding: 0 8px;
+}
+
+.numero {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.muestra {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 4px;
+  border-radius: 2px;
+  vertical-align: baseline;
+}

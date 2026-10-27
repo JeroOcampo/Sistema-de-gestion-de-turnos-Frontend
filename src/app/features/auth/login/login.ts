@@ -9,7 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 import { ErrorApi } from '../../../core/models/error-api.model';
 import { AuthService } from '../../../core/services/auth.service';
-import { NotificacionService } from '../../../core/services/notificacion.service';
+import { AvisoService } from '../../../core/services/aviso.service';
 import { AlertaError } from '../../../shared/components/alerta-error/alerta-error';
 
 @Component({
@@ -32,7 +32,7 @@ export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly avisos = inject(NotificacionService);
+  private readonly avisos = inject(AvisoService);
 
   protected readonly formulario = this.fb.nonNullable.group({
     dni: ['', [Validators.required, Validators.pattern(/^\d{7,8}$/)]],

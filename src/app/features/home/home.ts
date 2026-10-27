@@ -36,7 +36,7 @@ export class Home {
     {
       icono: 'event_note',
       titulo: 'Gestionar tus turnos',
-      descripcion: 'Consultá tus próximos turnos y cancelá o reprogramá los que necesites.',
+      descripcion: 'Consultá tus próximos turnos y cancelá los que no vayas a poder usar.',
     },
     {
       icono: 'history_edu',

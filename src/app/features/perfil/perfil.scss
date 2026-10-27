@@ -1,11 +1,9 @@
-.cargando {
-  display: flex;
-  justify-content: center;
-  padding: 48px 0;
+mat-card {
+  max-width: 760px;
 }
 
-mat-card {
-  max-width: 720px;
+.edicion {
+  margin-top: 16px;
 }
 
 .datos {
@@ -27,4 +25,22 @@ mat-card {
     font: var(--mat-sys-body-large);
     overflow-wrap: anywhere;
   }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 8px;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  column-gap: 16px;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
 }

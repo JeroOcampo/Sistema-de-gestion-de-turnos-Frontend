@@ -1,0 +1,115 @@
+<app-encabezado-pagina
+  titulo="Mis turnos"
+  subtitulo="Del más próximo al menos próximo. Abrí un turno para ver el detalle."
+  icono="event_note"
+/>
+
+<app-alerta-error [mensaje]="errorServidor()" />
+
+<ng-template #panelTurno let-turno let-esProximo="esProximo">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <span class="fecha-turno">{{ turno.fecha | date: 'dd/MM/yyyy' }} · {{ turno.hora }} h</span>
+      </mat-panel-title>
+      <mat-panel-description>
+        <span>{{ turno.especialidad_descripcion }} · {{ turno.medico_nombre }}</span>
+        <app-estado-turno [estado]="turno.estado" />
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <dl class="detalle">
+      <div>
+        <dt>Fecha</dt>
+        <dd class="capitalizado">{{ turno.fecha | date: 'EEEE dd/MM/yyyy' }}, {{ turno.hora }} h</dd>
+      </div>
+      <div>
+        <dt>Especialista</dt>
+        <dd>{{ turno.medico_nombre }}</dd>
+      </div>
+      <div>
+        <dt>Especialidad</dt>
+        <dd>{{ turno.especialidad_descripcion }}</dd>
+      </div>
+      <div>
+        <dt>Sede</dt>
+        <dd>{{ turno.sede_nombre }}</dd>
+      </div>
+      <div>
+        <dt>Cobertura</dt>
+        <dd>{{ turno.cobertura_nombre ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt>Nota</dt>
+        <dd>{{ turno.nota }}</dd>
+      </div>
+    </dl>
+
+    @if (turno.estado === 'atendido') {
+      <section class="historial" aria-label="Historial clínico del turno">
+        <h3>Historial clínico</h3>
+        @if (turno.historial; as registro) {
+          <dl class="detalle">
+            <div>
+              <dt>Diagnóstico</dt>
+              <dd>{{ registro.diagnostico }}</dd>
+            </div>
+            <div>
+              <dt>Tratamiento</dt>
+              <dd>{{ registro.tratamiento || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Observaciones</dt>
+              <dd>{{ registro.observaciones || '—' }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <p class="texto-secundario">El médico no cargó el historial de este turno.</p>
+        }
+      </section>
+    }
+
+    @if (esProximo && turno.estado === 'confirmado') {
+      <mat-action-row>
+        <button mat-stroked-button type="button" (click)="cancelar(turno)">
+          <mat-icon>event_busy</mat-icon>
+          Cancelar turno
+        </button>
+      </mat-action-row>
+    }
+  </mat-expansion-panel>
+</ng-template>
+
+@if (cargando()) {
+  <app-cargando texto="Cargando tus turnos…" />
+} @else if (proximos().length === 0 && anteriores().length === 0) {
+  <app-estado-vacio icono="event_note" mensaje="Todavía no tenés turnos.">
+    <a mat-flat-button routerLink="/paciente/turnos/nuevo">Sacar un turno</a>
+  </app-estado-vacio>
+} @else {
+  <h2 class="titulo-seccion">Próximos turnos</h2>
+  @if (proximos().length === 0) {
+    <app-estado-vacio icono="event_available" mensaje="No tenés turnos próximos.">
+      <a mat-flat-button routerLink="/paciente/turnos/nuevo">Sacar un turno</a>
+    </app-estado-vacio>
+  } @else {
+    <mat-accordion>
+      @for (turno of proximos(); track turno.id) {
+        <ng-container
+          *ngTemplateOutlet="panelTurno; context: { $implicit: turno, esProximo: true }"
+        />
+      }
+    </mat-accordion>
+  }
+
+  @if (anteriores().length > 0) {
+    <h2 class="titulo-seccion">Turnos anteriores</h2>
+    <mat-accordion>
+      @for (turno of anteriores(); track turno.id) {
+        <ng-container
+          *ngTemplateOutlet="panelTurno; context: { $implicit: turno, esProximo: false }"
+        />
+      }
+    </mat-accordion>
+  }
+}

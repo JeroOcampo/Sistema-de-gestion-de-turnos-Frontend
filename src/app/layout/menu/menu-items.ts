@@ -8,29 +8,27 @@ export interface OpcionMenu {
 
 const PERFIL: OpcionMenu = { etiqueta: 'Mi perfil', icono: 'account_circle', ruta: '/perfil' };
 
-/**
- * Opciones de navegación por rol. Las rutas de semanas futuras existen y
- * muestran la pantalla "En construcción" hasta que se implementen.
- */
+/** Opciones de navegación por rol. */
 export const MENU_POR_ROL: Record<Rol, OpcionMenu[]> = {
   paciente: [
     { etiqueta: 'Inicio', icono: 'home', ruta: '/paciente' },
     { etiqueta: 'Sacar turno', icono: 'event_available', ruta: '/paciente/turnos/nuevo' },
     { etiqueta: 'Mis turnos', icono: 'event_note', ruta: '/paciente/turnos' },
     { etiqueta: 'Historial clínico', icono: 'history_edu', ruta: '/paciente/historial' },
-    PERFIL,
+    { etiqueta: 'Mis datos personales', icono: 'account_circle', ruta: '/perfil' },
   ],
   medico: [
     { etiqueta: 'Inicio', icono: 'home', ruta: '/medico' },
     { etiqueta: 'Mi agenda', icono: 'calendar_month', ruta: '/medico/agenda' },
-    { etiqueta: 'Turnos del día', icono: 'today', ruta: '/medico/turnos' },
+    { etiqueta: 'Turnos programados', icono: 'today', ruta: '/medico/turnos' },
     { etiqueta: 'Historial clínico', icono: 'history_edu', ruta: '/medico/historial' },
     PERFIL,
   ],
   operador: [
     { etiqueta: 'Inicio', icono: 'home', ruta: '/operador' },
-    { etiqueta: 'Turnos de la sede', icono: 'event_note', ruta: '/operador/turnos' },
-    { etiqueta: 'Pacientes', icono: 'groups', ruta: '/operador/pacientes' },
+    { etiqueta: 'Agenda y turnos', icono: 'event_note', ruta: '/operador/agenda' },
+    { etiqueta: 'Asignar turno', icono: 'event_available', ruta: '/operador/turnos/nuevo' },
+    { etiqueta: 'Alta de paciente', icono: 'person_add', ruta: '/operador/pacientes/nuevo' },
     PERFIL,
   ],
   administrador: [

@@ -1,0 +1,101 @@
+<h2 mat-dialog-title>{{ esEdicion ? 'Modificar rango horario' : 'Nuevo rango horario' }}</h2>
+
+<form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+  <mat-dialog-content class="campos-dialogo">
+    <app-alerta-error [mensaje]="errorServidor()" />
+
+    @if (puedeElegirMedico) {
+      <mat-form-field appearance="outline">
+        <mat-label>Médico</mat-label>
+        <mat-select formControlName="id_medico">
+          @for (medico of datos.medicos; track medico.id) {
+            <mat-option [value]="medico.id">{{ medico.apellido }}, {{ medico.nombre }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>Puede no tener agenda cargada todavía.</mat-hint>
+        <mat-error>Elegí el médico.</mat-error>
+      </mat-form-field>
+    } @else {
+      <p class="dato-fijo">
+        Médico: <strong>{{ nombreMedico() }}</strong>
+      </p>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha</mat-label>
+      <input matInput [matDatepicker]="selectorFecha" [min]="hoy" formControlName="fecha" />
+      <mat-datepicker-toggle matIconSuffix [for]="selectorFecha" />
+      <mat-datepicker #selectorFecha />
+      @if (formulario.controls.fecha.hasError('required')) {
+        <mat-error>La fecha es obligatoria.</mat-error>
+      } @else if (formulario.controls.fecha.hasError('matDatepickerParse')) {
+        <mat-error>Ingresá una fecha válida (dd/mm/aaaa).</mat-error>
+      } @else if (formulario.controls.fecha.hasError('matDatepickerMin')) {
+        <mat-error>No se puede cargar agenda en una fecha pasada.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="fila-doble">
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de entrada</mat-label>
+        <mat-select formControlName="hora_entrada">
+          @for (hora of horarios; track hora) {
+            <mat-option [value]="hora">{{ hora }}</mat-option>
+          }
+        </mat-select>
+        <mat-error>Elegí la hora de entrada.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de salida</mat-label>
+        <mat-select formControlName="hora_salida" [errorStateMatcher]="matcherSalida">
+          @for (hora of horarios; track hora) {
+            <mat-option [value]="hora">{{ hora }}</mat-option>
+          }
+        </mat-select>
+        @if (formulario.controls.hora_salida.hasError('required')) {
+          <mat-error>Elegí la hora de salida.</mat-error>
+        } @else if (formulario.hasError('salidaAnterior')) {
+          <mat-error>Debe ser posterior a la hora de entrada.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Especialidad</mat-label>
+      <mat-select formControlName="id_especialidad">
+        @for (especialidad of especialidades(); track especialidad.id) {
+          <mat-option [value]="especialidad.id">{{ especialidad.descripcion }}</mat-option>
+        }
+      </mat-select>
+      @if (!formulario.controls.id_medico.value) {
+        <mat-hint>Elegí primero el médico.</mat-hint>
+      }
+      <mat-error>Elegí la especialidad.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Sede</mat-label>
+      <mat-select formControlName="id_sede">
+        @for (sede of datos.sedes; track sede.id) {
+          <mat-option [value]="sede.id">{{ sede.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (datos.sedeFija) {
+        <mat-hint>Solo podés cargar agenda en tu sede.</mat-hint>
+      }
+      <mat-error>Elegí la sede.</mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">
+      @if (guardando()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        Guardar
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,244 @@
+<app-encabezado-pagina
+  [titulo]="esOperador ? 'Asignar turno' : 'Sacar turno'"
+  [subtitulo]="
+    esOperador
+      ? 'Buscá al paciente y asignale un turno en tu sede.'
+      : 'Elegí la especialidad, la sede, el médico y un horario disponible.'
+  "
+  icono="event_available"
+/>
+
+<app-alerta-error [mensaje]="errorServidor()" />
+
+@if (cargandoInicial()) {
+  <app-cargando />
+} @else {
+  <mat-stepper linear orientation="vertical" class="pasos">
+    @if (esOperador) {
+      <mat-step [stepControl]="pasoPaciente" label="Paciente">
+        <form class="busqueda" [formGroup]="busquedaPaciente" (ngSubmit)="buscarPacientes()" novalidate>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>DNI o apellido del paciente</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input matInput formControlName="texto" autocomplete="off" />
+            <mat-error>Ingresá al menos 2 caracteres.</mat-error>
+          </mat-form-field>
+          <button mat-stroked-button type="submit" [disabled]="buscandoPacientes()">Buscar</button>
+        </form>
+
+        @if (buscandoPacientes()) {
+          <app-cargando texto="Buscando pacientes…" />
+        } @else if (pacientesEncontrados(); as encontrados) {
+          @if (encontrados.length === 0) {
+            <app-estado-vacio
+              icono="person_search"
+              mensaje="No se encontraron pacientes. Si es nuevo, dalo de alta desde «Alta de paciente»."
+            />
+          } @else {
+            <div class="lista-pacientes">
+              @for (encontrado of encontrados; track encontrado.id) {
+                <button
+                  type="button"
+                  class="opcion-paciente"
+                  [class.elegido]="paciente()?.id === encontrado.id"
+                  [attr.aria-pressed]="paciente()?.id === encontrado.id"
+                  (click)="elegirPaciente(encontrado)"
+                >
+                  <mat-icon>{{ paciente()?.id === encontrado.id ? 'check_circle' : 'person' }}</mat-icon>
+                  <span>
+                    <strong>{{ encontrado.apellido }}, {{ encontrado.nombre }}</strong>
+                    <span class="texto-secundario">
+                      DNI {{ encontrado.dni }} · {{ encontrado.cobertura_nombre ?? 'Sin cobertura' }}
+                    </span>
+                  </span>
+                </button>
+              }
+            </div>
+          }
+        }
+
+        <div class="acciones-paso">
+          <button mat-flat-button matStepperNext type="button" [disabled]="!paciente()">Siguiente</button>
+        </div>
+      </mat-step>
+    }
+
+    <mat-step [stepControl]="pasoEspecialidad" label="Especialidad">
+      <form [formGroup]="pasoEspecialidad">
+        <mat-chip-listbox formControlName="id_especialidad" aria-label="Especialidad">
+          @for (especialidad of especialidades(); track especialidad.id) {
+            <mat-chip-option [value]="especialidad.id">{{ especialidad.descripcion }}</mat-chip-option>
+          }
+        </mat-chip-listbox>
+        <div class="acciones-paso">
+          @if (esOperador) {
+            <button mat-button matStepperPrevious type="button">Atrás</button>
+          }
+          <button mat-flat-button matStepperNext type="button">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    @if (!esOperador) {
+      <mat-step [stepControl]="pasoSede" label="Sede">
+        <form [formGroup]="pasoSede">
+          <mat-chip-listbox formControlName="id_sede" aria-label="Sede">
+            @for (sede of sedes(); track sede.id) {
+              <mat-chip-option [value]="sede.id">{{ sede.nombre }}</mat-chip-option>
+            }
+          </mat-chip-listbox>
+          @if (sedeElegida(); as sede) {
+            <p class="texto-secundario">{{ sede.direccion }} · Tel. {{ sede.telefono }}</p>
+          }
+          <div class="acciones-paso">
+            <button mat-button matStepperPrevious type="button">Atrás</button>
+            <button mat-flat-button matStepperNext type="button">Siguiente</button>
+          </div>
+        </form>
+      </mat-step>
+    }
+
+    <mat-step [stepControl]="pasoMedico" label="Médico">
+      <form [formGroup]="pasoMedico">
+        @if (esOperador) {
+          <p class="texto-secundario">Sede: {{ sedeElegida()?.nombre }} (tu sede)</p>
+        }
+        @if (cargandoMedicos()) {
+          <app-cargando texto="Buscando médicos…" />
+        } @else if (medicos().length === 0) {
+          <app-estado-vacio
+            icono="person_off"
+            [mensaje]="
+              'No hay médicos de ' +
+              (especialidadElegida()?.descripcion ?? 'esa especialidad') +
+              ' con agenda en ' +
+              (sedeElegida()?.nombre ?? 'esa sede') +
+              '. Probá con otra especialidad' +
+              (esOperador ? '.' : ' u otra sede.')
+            "
+          />
+        } @else {
+          <mat-chip-listbox formControlName="id_medico" aria-label="Médico">
+            @for (medico of medicos(); track medico.id) {
+              <mat-chip-option [value]="medico.id">{{ medico.nombre }} {{ medico.apellido }}</mat-chip-option>
+            }
+          </mat-chip-listbox>
+        }
+        <div class="acciones-paso">
+          <button mat-button matStepperPrevious type="button">Atrás</button>
+          <button mat-flat-button matStepperNext type="button">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="pasoFecha" label="Fecha">
+      @if (cargandoFechas()) {
+        <app-cargando texto="Buscando fechas disponibles…" />
+      } @else if (fechas().length === 0) {
+        <app-estado-vacio
+          icono="event_busy"
+          mensaje="El médico no tiene fechas con horarios libres. Elegí otro médico."
+        />
+      } @else {
+        <p class="texto-secundario">Solo se pueden elegir los días en que el médico atiende.</p>
+        <mat-calendar
+          class="calendario"
+          [dateFilter]="filtroFechas"
+          [minDate]="primeraFecha()"
+          [maxDate]="ultimaFecha()"
+          [startAt]="fechaComoDate() ?? primeraFecha()"
+          [selected]="fechaComoDate()"
+          (selectedChange)="elegirFecha($event)"
+        />
+      }
+      <div class="acciones-paso">
+        <button mat-button matStepperPrevious type="button">Atrás</button>
+        <button mat-flat-button matStepperNext type="button">Siguiente</button>
+      </div>
+    </mat-step>
+
+    <mat-step [stepControl]="pasoHorario" label="Horario" #pasoHorarioRef>
+      <form [formGroup]="pasoHorario">
+        <app-alerta-error [mensaje]="errorTurno()" />
+        @if (fecha(); as dia) {
+          <p class="texto-secundario">Horarios libres del {{ dia | date: 'EEEE dd/MM/yyyy' }}:</p>
+        }
+        @if (cargandoHorarios()) {
+          <app-cargando texto="Buscando horarios libres…" />
+        } @else if (horarios().length === 0) {
+          <app-estado-vacio
+            icono="schedule"
+            mensaje="No quedan horarios libres para ese día. Elegí otra fecha."
+          />
+        } @else {
+          <mat-chip-listbox formControlName="hora" aria-label="Horario" (change)="errorTurno.set(null)">
+            @for (horario of horarios(); track horario) {
+              <mat-chip-option [value]="horario">{{ horario }}</mat-chip-option>
+            }
+          </mat-chip-listbox>
+        }
+        <div class="acciones-paso">
+          <button mat-button matStepperPrevious type="button">Atrás</button>
+          <button mat-flat-button matStepperNext type="button">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="pasoConfirmacion" label="Confirmación">
+      <form [formGroup]="pasoConfirmacion" (ngSubmit)="confirmar()" novalidate>
+        <dl class="resumen">
+          @if (esOperador) {
+            <div>
+              <dt>Paciente</dt>
+              <dd>{{ paciente()?.apellido }}, {{ paciente()?.nombre }} (DNI {{ paciente()?.dni }})</dd>
+            </div>
+          }
+          <div>
+            <dt>Especialidad</dt>
+            <dd>{{ especialidadElegida()?.descripcion }}</dd>
+          </div>
+          <div>
+            <dt>Médico</dt>
+            <dd>{{ medicoElegido()?.nombre }} {{ medicoElegido()?.apellido }}</dd>
+          </div>
+          <div>
+            <dt>Sede</dt>
+            <dd>{{ sedeElegida()?.nombre }} · {{ sedeElegida()?.direccion }}</dd>
+          </div>
+          <div>
+            <dt>Fecha</dt>
+            <dd class="capitalizado">{{ fecha() | date: 'EEEE dd/MM/yyyy' }}</dd>
+          </div>
+          <div>
+            <dt>Hora</dt>
+            <dd>{{ hora() }} h</dd>
+          </div>
+          <div>
+            <dt>Cobertura</dt>
+            <dd>{{ paciente()?.cobertura ?? 'Sin cobertura registrada' }}</dd>
+          </div>
+        </dl>
+
+        <mat-form-field appearance="outline" class="nota">
+          <mat-label>Nota para el médico (motivo de la consulta)</mat-label>
+          <input matInput formControlName="nota" [maxlength]="largoMaximoNota" />
+          <mat-hint align="end">{{ pasoConfirmacion.controls.nota.value.length }} / {{ largoMaximoNota }}</mat-hint>
+          @if (pasoConfirmacion.controls.nota.hasError('required')) {
+            <mat-error>La nota es obligatoria.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="acciones-paso">
+          <button mat-button matStepperPrevious type="button">Atrás</button>
+          <button mat-flat-button type="submit" [disabled]="enviando()">
+            @if (enviando()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              Confirmar turno
+            }
+          </button>
+        </div>
+      </form>
+    </mat-step>
+  </mat-stepper>
+}

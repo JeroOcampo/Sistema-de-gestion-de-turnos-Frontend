@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { InicioSeccion } from '../../shared/components/inicio-seccion/inicio-seccion';
-import { EnConstruccion } from '../errors/en-construccion/en-construccion';
+import { AgendaMedico } from './agenda/agenda-medico';
+import { HistorialMedico } from './historial/historial-medico';
+import { TurnosMedico } from './turnos/turnos-medico';
 
 export const MEDICO_ROUTES: Routes = [
   {
@@ -12,7 +14,7 @@ export const MEDICO_ROUTES: Routes = [
       icono: 'stethoscope',
     },
   },
-  { path: 'agenda', component: EnConstruccion, data: { titulo: 'Mi agenda' } },
-  { path: 'turnos', component: EnConstruccion, data: { titulo: 'Turnos del día' } },
-  { path: 'historial', component: EnConstruccion, data: { titulo: 'Historial clínico' } },
+  { path: 'agenda', component: AgendaMedico, title: 'Mi agenda' },
+  { path: 'turnos', component: TurnosMedico, title: 'Turnos programados' },
+  { path: 'historial', component: HistorialMedico, title: 'Historial clínico' },
 ];

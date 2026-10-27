@@ -35,3 +35,84 @@ body {
   --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error);
   --mat-snack-bar-button-color: var(--mat-sys-on-error);
 }
+
+// Estructura común de las pantallas de gestión: filtros arriba, tabla debajo.
+.barra-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+
+  .espaciador {
+    flex: 1 1 auto;
+  }
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+
+  table {
+    width: 100%;
+  }
+}
+
+.celda-acciones {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+// Botones de distinto alto (con texto y de ícono) alineados dentro de una celda.
+.acciones-fila {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.sin-corte {
+  white-space: nowrap;
+}
+
+.texto-secundario {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+}
+
+// Doble clase para ganarle al display: block de mat-dialog-content.
+.mat-mdc-dialog-content.campos-dialogo {
+  display: flex;
+  flex-direction: column;
+  min-width: 440px;
+}
+
+.dato-fijo {
+  margin: 0 0 16px;
+}
+
+.titulo-seccion {
+  margin: 24px 0 12px;
+  font: var(--mat-sys-title-medium);
+}
+
+// Panel de la campana de notificaciones: se dibuja en un overlay, fuera del header.
+.mat-mdc-menu-panel.menu-notificaciones {
+  width: 400px;
+  max-width: 400px;
+  max-height: 480px;
+}
+
+// Acciones destructivas (eliminar, cancelar un turno).
+.boton-peligro {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+}

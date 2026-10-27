@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Agenda de {{ datos.medico.nombre }} {{ datos.medico.apellido }}</h2>
+
+<mat-dialog-content class="campos-dialogo">
+  <p class="dato-fijo texto-secundario">
+    {{ datos.sede.nombre }} · {{ datos.fecha | date: 'EEEE dd/MM/yyyy' }}
+  </p>
+
+  <app-alerta-error [mensaje]="errorServidor()" />
+
+  @for (rango of rangos(); track rango.id) {
+    <div class="fila-rango">
+      <div>
+        <strong>{{ rango.hora_entrada }} a {{ rango.hora_salida }}</strong>
+        <div class="texto-secundario">{{ rango.especialidad_descripcion }}</div>
+      </div>
+      @if (!esPasada) {
+        <span>
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Modificar"
+            aria-label="Modificar rango horario"
+            (click)="abrirFormulario(rango)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Eliminar"
+            aria-label="Eliminar rango horario"
+            (click)="eliminar(rango)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </span>
+      }
+    </div>
+  } @empty {
+    <app-estado-vacio icono="event_busy" mensaje="El médico ya no tiene rangos horarios ese día." />
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (!esPasada) {
+    <button mat-stroked-button type="button" (click)="abrirFormulario()">
+      <mat-icon>add</mat-icon>
+      Agregar rango
+    </button>
+  }
+  <button mat-flat-button type="button" mat-dialog-close>Listo</button>
+</mat-dialog-actions>

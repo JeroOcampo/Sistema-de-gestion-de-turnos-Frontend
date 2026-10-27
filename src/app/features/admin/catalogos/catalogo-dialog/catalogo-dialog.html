@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>{{ datos.item ? 'Modificar' : 'Nueva' }} {{ config.singular }}</h2>
+
+<form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+  <mat-dialog-content class="campos-dialogo">
+    <app-alerta-error [mensaje]="errorServidor()" />
+
+    @for (campo of config.campos; track campo.clave) {
+      <mat-form-field appearance="outline">
+        <mat-label>{{ campo.etiqueta }}</mat-label>
+        <input matInput [formControlName]="campo.clave" [attr.maxlength]="campo.largoMaximo" />
+        @if (formulario.controls[campo.clave].hasError('required')) {
+          <mat-error>Este campo es obligatorio.</mat-error>
+        } @else if (formulario.controls[campo.clave].hasError('maxlength')) {
+          <mat-error>Máximo {{ campo.largoMaximo }} caracteres.</mat-error>
+        } @else if (formulario.controls[campo.clave].hasError('pattern')) {
+          <mat-error>{{ campo.patron?.mensaje }}</mat-error>
+        }
+      </mat-form-field>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">
+      @if (guardando()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        Guardar
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

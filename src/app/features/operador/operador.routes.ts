@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { InicioSeccion } from '../../shared/components/inicio-seccion/inicio-seccion';
-import { EnConstruccion } from '../errors/en-construccion/en-construccion';
+import { NuevoTurno } from '../turnos/nuevo-turno/nuevo-turno';
+import { AgendaOperador } from './agenda/agenda-operador';
+import { AltaPaciente } from './alta-paciente/alta-paciente';
 
 export const OPERADOR_ROUTES: Routes = [
   {
@@ -12,6 +14,8 @@ export const OPERADOR_ROUTES: Routes = [
       icono: 'support_agent',
     },
   },
-  { path: 'turnos', component: EnConstruccion, data: { titulo: 'Turnos de la sede' } },
-  { path: 'pacientes', component: EnConstruccion, data: { titulo: 'Pacientes' } },
+  { path: 'agenda', component: AgendaOperador, title: 'Agenda y turnos' },
+  // Mismo flujo que "Sacar turno" del paciente, con la sede fija en la del operador.
+  { path: 'turnos/nuevo', component: NuevoTurno, title: 'Asignar turno' },
+  { path: 'pacientes/nuevo', component: AltaPaciente, title: 'Alta de paciente' },
 ];

@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { InicioSeccion } from '../../shared/components/inicio-seccion/inicio-seccion';
-import { EnConstruccion } from '../errors/en-construccion/en-construccion';
+import { NuevoTurno } from '../turnos/nuevo-turno/nuevo-turno';
+import { HistorialPaciente } from './historial/historial-paciente';
+import { MisTurnos } from './mis-turnos/mis-turnos';
 
 export const PACIENTE_ROUTES: Routes = [
   {
@@ -12,7 +14,7 @@ export const PACIENTE_ROUTES: Routes = [
       icono: 'personal_injury',
     },
   },
-  { path: 'turnos/nuevo', component: EnConstruccion, data: { titulo: 'Sacar turno' } },
-  { path: 'turnos', component: EnConstruccion, data: { titulo: 'Mis turnos' } },
-  { path: 'historial', component: EnConstruccion, data: { titulo: 'Historial clínico' } },
+  { path: 'turnos/nuevo', component: NuevoTurno, title: 'Sacar turno' },
+  { path: 'turnos', component: MisTurnos, title: 'Mis turnos' },
+  { path: 'historial', component: HistorialPaciente, title: 'Historial clínico' },
 ];

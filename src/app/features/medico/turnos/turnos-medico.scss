@@ -1,0 +1,42 @@
+.fila-turno {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-low);
+  }
+
+  &.expandida {
+    background: var(--mat-sys-surface-container);
+
+    td {
+      border-bottom-color: transparent;
+    }
+  }
+}
+
+.fila-detalle {
+  height: 0;
+
+  &.oculta td {
+    border-bottom-width: 0;
+  }
+}
+
+.celda-detalle {
+  padding: 0 16px;
+}
+
+.detalle {
+  display: flex;
+  gap: 12px;
+  padding: 12px 8px 16px 56px;
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+
+  p {
+    margin: 2px 0 6px;
+    font: var(--mat-sys-body-large);
+  }
+}

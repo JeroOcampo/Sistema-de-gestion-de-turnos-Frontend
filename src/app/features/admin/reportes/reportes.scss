@@ -1,0 +1,70 @@
+.campo-rango {
+  width: 300px;
+}
+
+.tablero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: opacity 0.2s;
+
+  &.actualizando {
+    opacity: 0.55;
+  }
+}
+
+.progreso {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  background: #ffffff;
+
+  .etiqueta {
+    font: var(--mat-sys-label-large);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .valor {
+    font: var(--mat-sys-display-small);
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+  }
+
+  .detalle {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.graficos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tabla-ranking {
+  width: 100%;
+  background: transparent;
+}
+
+.numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

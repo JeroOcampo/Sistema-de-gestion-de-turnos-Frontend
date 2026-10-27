@@ -1,0 +1,172 @@
+<app-encabezado-pagina
+  [titulo]="esEdicion ? 'Modificar usuario' : 'Nuevo usuario'"
+  [subtitulo]="
+    esEdicion
+      ? 'Los cambios quedan registrados en la auditoría.'
+      : 'Alta de operadores, médicos y administradores.'
+  "
+  [icono]="esEdicion ? 'manage_accounts' : 'person_add'"
+/>
+
+<app-alerta-error [mensaje]="errorServidor()" />
+
+@if (cargando()) {
+  <app-cargando />
+} @else {
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+        <div class="fila">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" />
+            @if (formulario.controls.nombre.hasError('required')) {
+              <mat-error>El nombre es obligatorio.</mat-error>
+            } @else if (formulario.controls.nombre.hasError('maxlength')) {
+              <mat-error>Máximo 50 caracteres.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="apellido" />
+            @if (formulario.controls.apellido.hasError('required')) {
+              <mat-error>El apellido es obligatorio.</mat-error>
+            } @else if (formulario.controls.apellido.hasError('maxlength')) {
+              <mat-error>Máximo 50 caracteres.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="fila">
+          <mat-form-field appearance="outline">
+            <mat-label>DNI</mat-label>
+            <input matInput formControlName="dni" inputmode="numeric" maxlength="8" />
+            @if (formulario.controls.dni.hasError('required')) {
+              <mat-error>El DNI es obligatorio.</mat-error>
+            } @else if (formulario.controls.dni.hasError('pattern')) {
+              <mat-error>Solo números, 7 u 8 dígitos.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de nacimiento</mat-label>
+            <input
+              matInput
+              [matDatepicker]="selectorNacimiento"
+              [max]="hoy"
+              formControlName="fecha_nacimiento"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="selectorNacimiento" />
+            <mat-datepicker #selectorNacimiento startView="multi-year" />
+            @if (formulario.controls.fecha_nacimiento.hasError('required')) {
+              <mat-error>La fecha de nacimiento es obligatoria.</mat-error>
+            } @else if (formulario.controls.fecha_nacimiento.hasError('matDatepickerParse')) {
+              <mat-error>Ingresá una fecha válida (dd/mm/aaaa).</mat-error>
+            } @else if (formulario.controls.fecha_nacimiento.hasError('matDatepickerMax')) {
+              <mat-error>La fecha no puede ser futura.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="fila">
+          <mat-form-field appearance="outline">
+            <mat-label>Correo electrónico</mat-label>
+            <input matInput type="email" formControlName="email" />
+            @if (formulario.controls.email.hasError('required')) {
+              <mat-error>El correo electrónico es obligatorio.</mat-error>
+            } @else if (formulario.controls.email.hasError('email')) {
+              <mat-error>Ingresá un correo con formato válido.</mat-error>
+            } @else if (formulario.controls.email.hasError('maxlength')) {
+              <mat-error>Máximo 100 caracteres.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono (opcional)</mat-label>
+            <input matInput formControlName="telefono" inputmode="tel" />
+            @if (formulario.controls.telefono.hasError('pattern')) {
+              <mat-error>Ingresá solo números (entre 6 y 20 dígitos).</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="fila">
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo de usuario</mat-label>
+            <mat-select formControlName="rol">
+              @for (opcion of rolesDisponibles; track opcion) {
+                <mat-option [value]="opcion">{{ etiquetaRol[opcion] }}</mat-option>
+              }
+            </mat-select>
+            @if (esEdicion) {
+              <mat-hint>El tipo de usuario no se puede cambiar.</mat-hint>
+            }
+            <mat-error>Elegí el tipo de usuario.</mat-error>
+          </mat-form-field>
+
+          @if (pideSede()) {
+            <mat-form-field appearance="outline">
+              <mat-label>Sede</mat-label>
+              <mat-select formControlName="id_sede">
+                @for (sede of sedes(); track sede.id) {
+                  <mat-option [value]="sede.id">{{ sede.nombre }}</mat-option>
+                }
+              </mat-select>
+              <mat-error>Elegí la sede.</mat-error>
+            </mat-form-field>
+          }
+
+          @if (esPaciente()) {
+            <mat-form-field appearance="outline">
+              <mat-label>Cobertura médica</mat-label>
+              <mat-select formControlName="id_cobertura">
+                @for (cobertura of coberturas(); track cobertura.id) {
+                  <mat-option [value]="cobertura.id">{{ cobertura.nombre }}</mat-option>
+                }
+              </mat-select>
+              <mat-error>Elegí la cobertura.</mat-error>
+            </mat-form-field>
+          }
+        </div>
+
+        @if (esMedico()) {
+          <mat-form-field appearance="outline">
+            <mat-label>Especialidades</mat-label>
+            <mat-select formControlName="especialidades" multiple>
+              @for (especialidad of especialidades(); track especialidad.id) {
+                <mat-option [value]="especialidad.id">{{ especialidad.descripcion }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>El médico solo puede tener agenda en sus especialidades.</mat-hint>
+            <mat-error>Elegí al menos una especialidad.</mat-error>
+          </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ esEdicion ? 'Nueva contraseña (opcional)' : 'Contraseña' }}</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="new-password" />
+          <mat-hint>
+            {{ esEdicion ? 'Dejala vacía para conservar la actual.' : 'Mínimo 6 caracteres' }}
+          </mat-hint>
+          @if (formulario.controls.password.hasError('required')) {
+            <mat-error>La contraseña es obligatoria.</mat-error>
+          } @else if (formulario.controls.password.hasError('minlength')) {
+            <mat-error>La contraseña debe tener al menos 6 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="acciones">
+          <a mat-button routerLink="/admin/usuarios">Volver</a>
+          <button mat-flat-button type="submit" [disabled]="guardando()">
+            @if (guardando()) {
+              <mat-spinner diameter="20" />
+            } @else {
+              {{ esEdicion ? 'Guardar cambios' : 'Crear usuario' }}
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+}

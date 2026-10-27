@@ -17,6 +17,7 @@ export interface DatosRegistroPaciente {
   password: string;
   /** Formato AAAA-MM-DD, como lo espera la columna DATE de MySQL. */
   fecha_nacimiento: string;
+  telefono?: string;
   id_cobertura: number;
 }
 

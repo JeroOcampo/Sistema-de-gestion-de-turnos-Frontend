@@ -1,6 +1,15 @@
 import { Routes } from '@angular/router';
 import { InicioSeccion } from '../../shared/components/inicio-seccion/inicio-seccion';
-import { EnConstruccion } from '../errors/en-construccion/en-construccion';
+import { Auditoria } from './auditoria/auditoria';
+import {
+  CATALOGO_COBERTURAS,
+  CATALOGO_ESPECIALIDADES,
+  CATALOGO_SEDES,
+} from './catalogos/catalogos';
+import { Catalogo } from './catalogos/catalogo/catalogo';
+import { Reportes } from './reportes/reportes';
+import { FormularioUsuario } from './usuarios/formulario-usuario/formulario-usuario';
+import { ListaUsuarios } from './usuarios/lista-usuarios/lista-usuarios';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -12,10 +21,22 @@ export const ADMIN_ROUTES: Routes = [
       icono: 'admin_panel_settings',
     },
   },
-  { path: 'usuarios', component: EnConstruccion, data: { titulo: 'Usuarios' } },
-  { path: 'sedes', component: EnConstruccion, data: { titulo: 'Sedes' } },
-  { path: 'especialidades', component: EnConstruccion, data: { titulo: 'Especialidades' } },
-  { path: 'coberturas', component: EnConstruccion, data: { titulo: 'Coberturas' } },
-  { path: 'reportes', component: EnConstruccion, data: { titulo: 'Reportes' } },
-  { path: 'auditoria', component: EnConstruccion, data: { titulo: 'Auditoría' } },
+  { path: 'usuarios', component: ListaUsuarios, title: 'Usuarios' },
+  { path: 'usuarios/nuevo', component: FormularioUsuario, title: 'Nuevo usuario' },
+  { path: 'usuarios/:id', component: FormularioUsuario, title: 'Modificar usuario' },
+  { path: 'sedes', component: Catalogo, data: { catalogo: CATALOGO_SEDES }, title: 'Sedes' },
+  {
+    path: 'especialidades',
+    component: Catalogo,
+    data: { catalogo: CATALOGO_ESPECIALIDADES },
+    title: 'Especialidades',
+  },
+  {
+    path: 'coberturas',
+    component: Catalogo,
+    data: { catalogo: CATALOGO_COBERTURAS },
+    title: 'Coberturas',
+  },
+  { path: 'reportes', component: Reportes, title: 'Reportes' },
+  { path: 'auditoria', component: Auditoria, title: 'Auditoría' },
 ];

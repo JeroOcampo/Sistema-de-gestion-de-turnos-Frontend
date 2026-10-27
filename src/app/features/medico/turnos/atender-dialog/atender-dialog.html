@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>Marcar como atendido</h2>
+
+<form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+  <mat-dialog-content class="campos-dialogo">
+    <p class="dato-fijo">
+      <strong>{{ turno.paciente_nombre }}</strong> · {{ turno.hora }} h · {{ turno.sede_nombre }}
+    </p>
+
+    <app-alerta-error [mensaje]="errorServidor()" />
+
+    <mat-form-field appearance="outline">
+      <mat-label>Diagnóstico</mat-label>
+      <textarea matInput formControlName="diagnostico" rows="2" [maxlength]="largoMaximo"></textarea>
+      <mat-error>El diagnóstico es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tratamiento</mat-label>
+      <textarea matInput formControlName="tratamiento" rows="2" [maxlength]="largoMaximo"></textarea>
+      <mat-error>El tratamiento es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Observaciones</mat-label>
+      <textarea
+        matInput
+        formControlName="observaciones"
+        rows="2"
+        [maxlength]="largoMaximo"
+      ></textarea>
+      <mat-error>Las observaciones son obligatorias.</mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Volver</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">
+      @if (guardando()) {
+        <mat-spinner diameter="20" />
+      } @else {
+        Guardar y marcar atendido
+      }
+    </button>
+  </mat-dialog-actions>
+</form>
