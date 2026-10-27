@@ -1,0 +1,52 @@
+<app-encabezado-pagina
+  titulo="Mi perfil"
+  subtitulo="Datos de tu cuenta en la clínica"
+  icono="account_circle"
+/>
+
+<app-alerta-error [mensaje]="errorServidor()" />
+
+@if (cargando()) {
+  <div class="cargando"><mat-spinner diameter="40" /></div>
+} @else if (usuario(); as u) {
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <dl class="datos">
+        <div>
+          <dt>Nombre</dt>
+          <dd>{{ u.nombre }}</dd>
+        </div>
+        <div>
+          <dt>Apellido</dt>
+          <dd>{{ u.apellido }}</dd>
+        </div>
+        <div>
+          <dt>DNI</dt>
+          <dd>{{ u.dni }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de nacimiento</dt>
+          <dd>{{ u.fecha_nacimiento | date: 'dd/MM/yyyy' : 'UTC' }}</dd>
+        </div>
+        <div>
+          <dt>Correo electrónico</dt>
+          <dd>{{ u.email }}</dd>
+        </div>
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{{ u.telefono || 'No informado' }}</dd>
+        </div>
+        <div>
+          <dt>Tipo de usuario</dt>
+          <dd>{{ etiquetaRol[u.rol] }}</dd>
+        </div>
+        @if (u.rol === 'paciente') {
+          <div>
+            <dt>Cobertura</dt>
+            <dd>{{ cobertura() ?? 'No informada' }}</dd>
+          </div>
+        }
+      </dl>
+    </mat-card-content>
+  </mat-card>
+}

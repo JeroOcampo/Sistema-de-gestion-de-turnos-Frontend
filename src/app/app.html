@@ -1,0 +1,21 @@
+<div class="aplicacion">
+  <app-header (alternarMenu)="alternarMenu()" />
+
+  <mat-sidenav-container class="contenedor">
+    <mat-sidenav
+      [mode]="esPantallaChica() ? 'over' : 'side'"
+      [opened]="menuAbierto()"
+      (closedStart)="registrarCierreMenu()"
+      class="panel-menu"
+    >
+      <app-menu (opcionElegida)="cerrarMenuSiEsChico()" />
+    </mat-sidenav>
+
+    <mat-sidenav-content class="contenido">
+      <main class="principal">
+        <router-outlet />
+      </main>
+      <app-footer />
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

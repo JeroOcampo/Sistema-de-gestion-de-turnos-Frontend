@@ -1,0 +1,45 @@
+<mat-toolbar class="encabezado">
+  @if (auth.haySesion()) {
+    <button mat-icon-button type="button" aria-label="Mostrar u ocultar el menú" (click)="alternarMenu.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+
+  <a class="marca" routerLink="/" aria-label="Ir al inicio de la clínica virtual">
+    <mat-icon>local_hospital</mat-icon>
+    <span class="marca-nombre">Clínica Virtual</span>
+  </a>
+
+  <span class="separador"></span>
+
+  @if (auth.haySesion()) {
+    <div class="sesion">
+      @if (nombreCompleto()) {
+        <span class="nombre-usuario">{{ nombreCompleto() }}</span>
+      }
+      <mat-icon
+        class="icono-rol"
+        tabindex="0"
+        role="img"
+        [attr.aria-label]="'Tipo de usuario: ' + tipoUsuario()"
+        [matTooltip]="'Tipo de usuario: ' + tipoUsuario()"
+        >info</mat-icon
+      >
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Notificaciones"
+        matTooltip="Notificaciones (próximamente)"
+      >
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <button mat-button type="button" class="cerrar-sesion" (click)="auth.cerrarSesion()">
+        <mat-icon>logout</mat-icon>
+        <span class="texto-boton">Cerrar sesión</span>
+      </button>
+    </div>
+  } @else {
+    <span class="bienvenida">Bienvenido a la clínica virtual</span>
+    <a mat-button class="acceso" routerLink="/login">Iniciar sesión</a>
+  }
+</mat-toolbar>

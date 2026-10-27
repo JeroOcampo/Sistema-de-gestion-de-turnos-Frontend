@@ -1,0 +1,35 @@
+@if (auth.haySesion()) {
+  <section class="bienvenida-sesion">
+    <mat-icon>waving_hand</mat-icon>
+    <h1>Hola{{ saludo() ? ', ' + saludo() : '' }}</h1>
+    <p>
+      Ingresaste como <strong>{{ tipoUsuario() }}</strong
+      >. Elegí una función del menú para comenzar.
+    </p>
+  </section>
+} @else {
+  <section class="presentacion">
+    <h1>Clínica Virtual</h1>
+    <p class="lead">
+      Gestioná tus turnos médicos de forma simple y sin llamadas. Para usar el sistema iniciá
+      sesión o creá tu cuenta de paciente.
+    </p>
+    <div class="acciones">
+      <a mat-flat-button routerLink="/login"><mat-icon>login</mat-icon> Iniciar sesión</a>
+      <a mat-stroked-button routerLink="/registro"><mat-icon>person_add</mat-icon> Registrarme</a>
+    </div>
+  </section>
+
+  <h2 class="titulo-seccion">Lo que podés hacer como paciente registrado</h2>
+  <div class="funcionalidades">
+    @for (funcionalidad of funcionalidades; track funcionalidad.titulo) {
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>{{ funcionalidad.icono }}</mat-icon>
+          <mat-card-title>{{ funcionalidad.titulo }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>{{ funcionalidad.descripcion }}</mat-card-content>
+      </mat-card>
+    }
+  </div>
+}
